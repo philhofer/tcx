@@ -1,0 +1,16 @@
+package tcx
+
+import (
+	"encoding/xml"
+	"io/ioutil"
+)
+
+func ReadAll(path string) (tcxfile *TCXFile, err error) {
+	filebytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	tcxfile = new(TCXFile)
+	err = xml.Unmarshal(filebytes, tcxfile)
+	return
+}
