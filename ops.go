@@ -2,6 +2,8 @@ package tcx
 
 import (
 	"github.com/philhofer/vec"
+	"math"
+	"time"
 )
 
 type TrackSpline struct {
@@ -25,6 +27,49 @@ func (t *TrackSpline) Speed(dist float64) float64 {
 
 func (t *TrackSpline) Alt(dist float64) float64 {
 	return t.alt.F(dist)
+}
+
+type LapZeroDistError struct{}
+
+func (l *LapZeroDistError) Error() string {
+	return "Lap Distance Cannot Be Zero."
+}
+
+func (lap Lap) MatchTime(sec float64) error {
+	isec := int(math.Floor(sec))
+	ldist := lap.Dist
+	if ldist == 0 {
+		return new(LapZeroDistError)
+	}
+	maxs := lap.MaxSpeed
+	startTime := lap.Trk.Pt[0].Time
+	startDist := lap.Trk.Pt[0].Dist
+	vfactor := lap.TotalTime / sec
+	trkspl := Spline(lap.Trk)
+	newtrk := make([]Trackpoint, isec)
+	onesec, err := time.ParseDuration("1.0s")
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 0; i < isec; i++ {
+		thisSpeed := trkspl.Speed(startDist) * vfactor
+		if thisSpeed > maxs {
+			lap.MaxSpeed = thisSpeed
+		}
+		newtrk[i] = Trackpoint{
+			Time:  startTime,
+			Lat:   trkspl.Lat(startDist),
+			Long:  trkspl.Long(startDist),
+			Speed: thisSpeed,
+			Alt:   trkspl.Alt(startDist),
+		}
+		startDist += thisSpeed
+		startTime.Add(onesec)
+	}
+	lap.TotalTime = float64(isec)
+	lap.Trk = Track{Pt: newtrk}
+	return nil
 }
 
 func Spline(trk Track) *TrackSpline {
