@@ -35,12 +35,24 @@ func (l *LapZeroDistError) Error() string {
 	return "Lap Distance Cannot Be Zero."
 }
 
+type LapZeroTimeError struct{}
+
+func (l *LapZeroTimeError) Error() string {
+	return "Lap Time Cannot be <= 0"
+}
+
+//Match lap time to "sec" (in-place)
 func (lap Lap) MatchTime(sec float64) error {
 	isec := int(math.Floor(sec))
+	if isec <= 0 {
+		return new(LapZeroTimeError)
+	}
+
 	ldist := lap.Dist
 	if ldist == 0 {
 		return new(LapZeroDistError)
 	}
+
 	maxs := lap.MaxSpeed
 	startTime := lap.Trk.Pt[0].Time
 	startDist := lap.Trk.Pt[0].Dist
@@ -67,6 +79,7 @@ func (lap Lap) MatchTime(sec float64) error {
 		startDist += thisSpeed
 		startTime.Add(onesec)
 	}
+
 	lap.TotalTime = float64(isec)
 	lap.Trk = Track{Pt: newtrk}
 	return nil
