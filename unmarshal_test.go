@@ -5,7 +5,7 @@ import (
 )
 
 func TestUnmarshal(t *testing.T) {
-	db, err := ReadFile("sample.tcx")
+	db, err := ReadFile("files/sample.tcx")
 	if err != nil {
 		t.Error(err)
 	}
