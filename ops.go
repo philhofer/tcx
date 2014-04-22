@@ -81,11 +81,11 @@ func (lap Lap) MatchTime(sec float64) error {
 	}
 
 	lap.TotalTime = float64(isec)
-	lap.Trk = Track{Pt: newtrk}
+	lap.Trk = &Track{Pt: newtrk}
 	return nil
 }
 
-func Spline(trk Track) *TrackSpline {
+func Spline(trk *Track) *TrackSpline {
 	Npts := len(trk.Pt)
 	lats := make([]float64, Npts)
 	longs := make([]float64, Npts)

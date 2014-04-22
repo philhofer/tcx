@@ -28,7 +28,7 @@ type Lap struct {
 	MaxHr         float64 `xml:"MaximumHeartRateBpm>Value,omitempty"`
 	Intensity     string  `xml:",omitempty"`
 	TriggerMethod string  `xml:",omitempty"`
-	Trk           Track   `xml:"Track"`
+	Trk           *Track  `xml:"Track"`
 }
 
 type Track struct {
@@ -50,9 +50,9 @@ type Device struct {
 }
 
 type TCXDB struct {
-	XMLName xml.Name   `xml:"TrainingCenterDatabase"`
-	Acts    Activities `xml:"Activities"`
-	Auth    Author     `xml:"Author"`
+	XMLName xml.Name    `xml:"TrainingCenterDatabase"`
+	Acts    *Activities `xml:"Activities"`
+	Auth    Author      `xml:"Author"`
 }
 
 type Activities struct {
